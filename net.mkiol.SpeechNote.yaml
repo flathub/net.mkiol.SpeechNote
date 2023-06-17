@@ -18,6 +18,7 @@ finish-args:
   - --filesystem=xdg-music
   - --filesystem=xdg-documents
   - --env=QT_QUICK_CONTROLS_STYLE=org.kde.desktop
+  - --env=PYTORCH_TENSOREXPR=0
 cleanup:
   - "/cmake"
   - "/etc"
@@ -364,4 +365,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: 5a0d7a0e872fb4449c7b11c44d1da3532284a0bf
+        commit: 8e2a058d80c2ce99762bbd904e7d9d2812f54078
