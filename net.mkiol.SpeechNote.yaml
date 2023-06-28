@@ -289,7 +289,7 @@ modules:
         url: https://github.com/rhasspy/piper/archive/a0a051a57fca1839f40c9c7475db889999d702ba.zip
         sha256: 061fd6d0a71035e535a6e21e899a9fbc48107cdf5c137c67c1fad0257a15a0f8
       - type: patch
-        path: ../patches/piper.patch
+        path: patches/piper.patch
 
   - name: ssplitcpp
     buildsystem: cmake-ninja
@@ -388,4 +388,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: 6433f638b1ebfa8e3fe0d6108f4ab9aea731f7b4
+        commit: b6d2782305741c863eeeb4ed61fdd1796ed400ad
