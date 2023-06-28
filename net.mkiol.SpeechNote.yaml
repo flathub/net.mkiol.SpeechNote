@@ -124,17 +124,15 @@ modules:
         sha256: c01ded2c0a05667e6df2439c1c02b011a5df2bfdf49e24a524630686aea2b558
 
   - name: espeak
-    buildsystem: simple
-    build-commands:
-      - "mkdir espeak"
-      - "tar -x -C espeak --strip=1 -f lib/espeak-ng-1.52-patched.tar.gz"
-      - "cd espeak && ./autogen.sh"
-      - "cd espeak && ./configure --prefix=/app --with-pic --with-pcaudiolib=no --enable-static --disable-shared --disable-rpath --with-extdict-ru --with-extdict-zh --with-extdict-zhy"
-      - "cd espeak && make install"
+    buildsystem: autotools
+    config-opts:
+      - --with-pic
+      - --with-pcaudiolib=no
+      - --enable-static
     sources:
       - type: archive
-        url: https://github.com/rhasspy/piper/archive/e967bdc1a838023fe3644f8ed7cf6e1e958b42ef.zip
-        sha256: e8860ae278d4ea3154c94d8d9585200a19a25ec75dc3063d81896c5367d77c7b
+        url: https://github.com/rhasspy/espeak-ng/archive/61504f6b76bf9ebbb39b07d21cff2a02b87c99ff.zip
+        sha256: 8d9ce96189d231e527af5e26f49e293f01056a886c14a7c8eac1d58e7ced45ec
 
   - name: boost
     buildsystem: simple
