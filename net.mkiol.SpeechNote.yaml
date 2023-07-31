@@ -17,7 +17,6 @@ finish-args:
   - --filesystem=xdg-download
   - --filesystem=xdg-music
   - --filesystem=xdg-documents
-  - --env=QT_QUICK_CONTROLS_STYLE=org.kde.desktop
   - --env=PYTORCH_TENSOREXPR=0
 cleanup:
   - "/cmake"
@@ -383,6 +382,56 @@ modules:
       - type: patch
         path: patches/rhvoice.patch
 
+  - name: bergamot-fallback
+    only-arches:
+      - x86_64
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+      - -DBLAS_LIB_PATH=/app/lib/libopenblas.so
+      - -DBLAS_INC_DIR=/app/include/openblas
+      - -DUSE_INTRINSICS_SSE2=ON
+      - -DUSE_INTRINSICS_SSE3=OFF
+      - -DUSE_INTRINSICS_SSE41=OFF
+      - -DUSE_INTRINSICS_SSE42=OFF
+      - -DUSE_INTRINSICS_AVX=ON
+      - -DUSE_INTRINSICS_AVX2=OFF
+      - -DUSE_INTRINSICS_AVX512=OFF
+      - -DBUILD_ARCH=x86-64
+    post-install:
+      - "mv /app/lib/libbergamot_api.so /app/lib/libbergamot_api-fallback.so"
+    sources:
+      - type: git
+        url: https://github.com/browsermt/bergamot-translator.git
+        commit: ada8c3922490cc6a507bcf81fa4882b435595323
+      - type: patch
+        path: patches/bergamot.patch
+
+  - name: bergamot
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+      - -DBLAS_LIB_PATH=/app/lib/libopenblas.so
+      - -DBLAS_INC_DIR=/app/include/openblas
+      - -DUSE_INTRINSICS_AVX512=OFF
+      - -DUSE_INTRINSICS_ARMV7_NEONVFPV4=ON
+    build-options:
+      arch:
+        x86-64:
+          config-opts:
+            - -DBUILD_ARCH=x86-64
+        aarch64:
+          config-opts:
+            - -DBUILD_ARCH=armv8-a
+    sources:
+      - type: git
+        url: https://github.com/browsermt/bergamot-translator.git
+        commit: ada8c3922490cc6a507bcf81fa4882b435595323
+      - type: patch
+        path: patches/bergamot.patch
+
   - python3-modules-x86-64.yaml
 
   - name: dsnote
@@ -406,6 +455,7 @@ modules:
       - -DBUILD_PIPER=OFF
       - -DBUILD_SSPLITCPP=OFF
       - -DBUILD_RHVOICE=OFF
+      - -DBUILD_BERGAMOT=OFF
     build-options:
       arch:
         aarch64:
@@ -414,4 +464,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: 77d178bd2d51de3ea9dd0571bf850e127e345477
+        commit: f902095aaf369e8f198b7e241ffcb1783d659f84
