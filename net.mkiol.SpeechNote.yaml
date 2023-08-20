@@ -22,6 +22,7 @@ cleanup:
   - "/cmake"
   - "/etc"
   - "/man"
+  - "/dummy"
   - "/include"
   - "/lib/fst"
   - "/lib/cmake"
@@ -421,7 +422,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/RHVoice/RHVoice.git
-        commit: f2c0c49f9c8c812aa766ec911e69b8a2cf0e505d
+        commit: 51759044ff1871310fc222e21c5655f960ebfca3
       - type: patch
         path: patches/rhvoice.patch
 
@@ -589,4 +590,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: 89881df54ddaab92ac0a4646c9fbaf3c14f485f7
+        commit: 2ce551c55dc4a97f3428c5a805d252a342b15804
