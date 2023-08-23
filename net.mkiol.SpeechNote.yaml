@@ -590,4 +590,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: 825eab0ca9e4f84e4ac99e576a516e59fcfa08a8
+        commit: 9be8ce54ea1934405a987b041b34726d43433ea1
