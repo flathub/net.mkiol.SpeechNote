@@ -55,6 +55,7 @@ cleanup:
   - "/cuda/usr"
   - "/cuda/targets/x86_64-linux/lib/cmake"
   - "/cuda/targets/x86_64-linux/lib/libOpenCL.so*"
+  - "*/cmake/*"
   - "libboost*"
   - "libRHVoice_audio*"
   - "pcre2*"
@@ -784,4 +785,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: 666d266e806da596cdf2ccfe5ae9779ffa94b814
+        commit: c144c028420c5b7039a8ed6dce1da63326b29322
