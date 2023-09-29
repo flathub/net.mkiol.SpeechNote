@@ -21,6 +21,7 @@ finish-args:
   - --env=PYTORCH_TENSOREXPR=0
   - --env=LD_LIBRARY_PATH=/app/opt/cuda/lib64
   - --env=OPENCL_VENDOR_PATH=/app/opt/opencl/vendors
+  - --talk-name=org.freedesktop.Notifications
 cleanup:
   - "/cmake"
   - "/etc"
@@ -916,4 +917,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: a6be919f8ef8d8902878846eece8d76e9f7488bc
+        commit: 19b0dc4fd7617e4dde0683a485ea4984d5ecf327
