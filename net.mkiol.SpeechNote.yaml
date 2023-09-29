@@ -12,7 +12,7 @@ finish-args:
   - --socket=fallback-x11
   - --socket=wayland
   - --socket=pulseaudio
-  - --device=dri
+  - --device=all
   - --filesystem=xdg-desktop
   - --filesystem=xdg-download
   - --filesystem=xdg-music
@@ -905,4 +905,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: e3cb276c12540da4dbd0b80ebf648a651787259c
+        commit: 8259fa7ba19e5bec97f2f82176ac73205ddcae70
