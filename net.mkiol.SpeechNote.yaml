@@ -881,7 +881,7 @@ modules:
         sha256: 55995114e8b5947cb6a59a19a53840eaf81fddc420fd3d180dcb0db9d8d33e13
 
   - python3-modules-x86-64.yaml
-  - python3-faster-whisper.yaml
+  - python3-faster-whisper-x86-64.yaml
 
   - name: dsnote
     buildsystem: cmake-ninja

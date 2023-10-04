@@ -1,5 +1,7 @@
 # Generated with flatpak-pip-generator --yaml --arch-dependent-allow --arch-dependent-force faster-whisper
 name: python3-faster-whisper
+only-arches:
+  - x86_64
 buildsystem: simple
 build-commands:
   - pip3 install --verbose --exists-action=i --no-index --find-links="file://${PWD}"
