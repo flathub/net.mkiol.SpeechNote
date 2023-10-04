@@ -726,7 +726,7 @@ modules:
     buildsystem: simple
     build-commands:
       - mkdir cuda_src
-      - sh cuda_12.2.2_535.104.05_linux.run --target cuda_src --noexec
+      - sh cuda_11.8.0_520.61.05_linux.run --target cuda_src --noexec
       - cd cuda_src/builds && rm -rf NVIDIA*.run bin EULA.txt version.json cuda_sanitizer_api integration nsight_compute nsight_systems cuda_gdb cuda_documentation
       - mkdir -p /app/opt/cuda
       - cd cuda_src/builds && for lib in *; do echo "copying $lib/* => /app/opt/cuda/" && if [ -d $lib ]; then cp -r $lib/* /app/opt/cuda/; else cp $lib /app/opt/cuda/; fi; done
@@ -761,8 +761,8 @@ modules:
       - "/opt/cuda/targets/x86_64-linux/res"
     sources:
       - type: file
-        url: https://developer.download.nvidia.com/compute/cuda/12.2.2/local_installers/cuda_12.2.2_535.104.05_linux.run
-        sha256: 2b39aae3e7618d9f59a3c8fa1f1bc61f29c0b0e0df75fb05076badb352952ef2
+        url: https://developer.download.nvidia.com/compute/cuda/11.8.0/local_installers/cuda_11.8.0_520.61.05_linux.run
+        sha256: 9223c4af3aebe4a7bbed9abd9b163b03a1b34b855fbc2b4a0d1b706ac09a5a16
 
   - name: whispercpp-cublas
     only-arches:
@@ -777,6 +777,7 @@ modules:
       - -DWHISPER_CUBLAS=ON
       - -DCMAKE_C_FLAGS='-O3'
       - -DCMAKE_CXX_FLAGS='-O3'
+      - -DCMAKE_CUDA_FLAGS=' -allow-unsupported-compiler'
       - -DCUDAToolkit_ROOT=/app/opt/cuda
       - -DCMAKE_CUDA_COMPILER=/app/opt/cuda/bin/nvcc
       - -DCMAKE_CUDA_ARCHITECTURES=60;61;62;70;72;75;80;86;87;89;90
@@ -802,8 +803,6 @@ modules:
       - type: shell
         commands:
           - "autoreconf -fi"
-
-  - python3-modules-x86-64.yaml
 
   - name: rocm-opencl
     only-arches:
@@ -881,6 +880,9 @@ modules:
         url: https://github.com/Skycoder42/QHotkey/archive/cd72a013275803fce33e028fc8b05ae32248da1f.zip
         sha256: 55995114e8b5947cb6a59a19a53840eaf81fddc420fd3d180dcb0db9d8d33e13
 
+  - python3-modules-x86-64.yaml
+  - python3-faster-whisper.yaml
+
   - name: dsnote
     buildsystem: cmake-ninja
     config-opts:
@@ -917,4 +919,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: 9d6a9ba6644640514b97100e980e5b0c5f5134de
+        commit: a467766496085a4a684705bd6acf9d7186acb34b
