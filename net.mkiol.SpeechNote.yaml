@@ -888,6 +888,7 @@ modules:
 
   - python3-modules-x86-64.yaml
   - python3-faster-whisper-x86-64.yaml
+  - python3-mycroft_mimic3_tts.yaml
 
   - name: dsnote
     buildsystem: cmake-ninja
@@ -925,4 +926,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: 045147a270884aa53c26fd3e400f0b55d74183b2
+        commit: 63abbf4caea02ca5b3328ca5495c5f4bd53845e0
