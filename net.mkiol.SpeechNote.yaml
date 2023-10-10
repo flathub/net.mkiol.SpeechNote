@@ -876,7 +876,7 @@ modules:
       - -DCMAKE_CUDA_FLAGS=' -allow-unsupported-compiler'
       - -DCUDAToolkit_ROOT=/app/opt/cuda
       - -DCMAKE_CUDA_COMPILER=/app/opt/cuda/bin/nvcc
-      - -DCMAKE_CUDA_ARCHITECTURES=60;61;62;70;72;75;80;86;87;89;90
+      - -DCMAKE_CUDA_ARCHITECTURES=50;52;53;60;61;62;70;72;75;80;86;87;89;90
     post-install:
       - "mv /app/lib/libwhisper.so /app/lib/libwhisper-cublas.so"
     sources:
@@ -888,6 +888,7 @@ modules:
 
   - python3-modules-x86-64.yaml
   - python3-faster-whisper-x86-64.yaml
+  - python3-mycroft_mimic3_tts.yaml
 
   - name: dsnote
     buildsystem: cmake-ninja
@@ -925,4 +926,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: 045147a270884aa53c26fd3e400f0b55d74183b2
+        commit: 0e015a8668fccbfc685cb9576165be84f53842fa
