@@ -899,6 +899,7 @@ modules:
       - -DBUILD_TAGLIB=OFF
       - -DBUILD_LIBNUMBERTEXT=OFF
       - -DBUILD_QHOTKEY=OFF
+      - -DBUILD_APRILASR=OFF
     build-options:
       arch:
         aarch64:
