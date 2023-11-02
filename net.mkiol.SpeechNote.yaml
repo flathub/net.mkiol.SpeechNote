@@ -35,7 +35,6 @@ cleanup:
   - "/lib/fst"
   - "/lib/cmake"
   - "/lib/pkgconfig"
-  - "/lib/debug"
   - "/lib/python3.10/site-packages/nvidia*"
   - "/lib/python3.10/site-packages/cmake*"
   - "/lib/python3.10/site-packages/git*"
