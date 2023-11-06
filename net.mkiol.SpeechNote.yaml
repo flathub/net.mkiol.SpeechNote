@@ -562,8 +562,8 @@ modules:
         - "mv /app/lib/libwhisper.so /app/lib/libwhisper-openblas.so"
     sources:
       - type: archive
-        url: https://github.com/ggerganov/whisper.cpp/archive/951a1199265ff4424f938182542cf6bac9b36154.zip
-        sha256: cdbbaa45c50e6b12df933d7a5e914477edb918622d73d159dbec0867f5da2f63
+        url: https://github.com/ggerganov/whisper.cpp/archive/0463028bc2a5774fe7361c8ac37bef440725bcd7.zip
+        sha256: 9f4819e7122a635a803132f382e909004d62cec955c213dd734c09ff97449bcd
       - type: patch
         path: patches/whispercpp.patch
 
@@ -587,8 +587,8 @@ modules:
       - "mv /app/lib/libwhisper.so /app/lib/libwhisper-fallback.so"
     sources:
       - type: archive
-        url: https://github.com/ggerganov/whisper.cpp/archive/951a1199265ff4424f938182542cf6bac9b36154.zip
-        sha256: cdbbaa45c50e6b12df933d7a5e914477edb918622d73d159dbec0867f5da2f63
+        url: https://github.com/ggerganov/whisper.cpp/archive/0463028bc2a5774fe7361c8ac37bef440725bcd7.zip
+        sha256: 9f4819e7122a635a803132f382e909004d62cec955c213dd734c09ff97449bcd
       - type: patch
         path: patches/whispercpp.patch
 
@@ -631,8 +631,8 @@ modules:
       - "mv /app/lib/libwhisper.so /app/lib/libwhisper-clblast.so"
     sources:
       - type: archive
-        url: https://github.com/ggerganov/whisper.cpp/archive/951a1199265ff4424f938182542cf6bac9b36154.zip
-        sha256: cdbbaa45c50e6b12df933d7a5e914477edb918622d73d159dbec0867f5da2f63
+        url: https://github.com/ggerganov/whisper.cpp/archive/0463028bc2a5774fe7361c8ac37bef440725bcd7.zip
+        sha256: 9f4819e7122a635a803132f382e909004d62cec955c213dd734c09ff97449bcd
       - type: patch
         path: patches/whispercpp.patch
 
@@ -787,8 +787,8 @@ modules:
       - "mv /app/lib/libwhisper.so /app/lib/libwhisper-cublas.so"
     sources:
       - type: archive
-        url: https://github.com/ggerganov/whisper.cpp/archive/951a1199265ff4424f938182542cf6bac9b36154.zip
-        sha256: cdbbaa45c50e6b12df933d7a5e914477edb918622d73d159dbec0867f5da2f63
+        url: https://github.com/ggerganov/whisper.cpp/archive/0463028bc2a5774fe7361c8ac37bef440725bcd7.zip
+        sha256: 9f4819e7122a635a803132f382e909004d62cec955c213dd734c09ff97449bcd
       - type: patch
         path: patches/whispercpp.patch
 
@@ -904,4 +904,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: e70c349affc842a8fbe7a45db23645105af6ecba
+        commit: 22974049a557ada9ad68473c5195edc88d87a9db
