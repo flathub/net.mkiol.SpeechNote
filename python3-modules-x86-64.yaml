@@ -219,6 +219,7 @@ modules:
     cleanup:
       - "/bin"
       - "/lib/*.so*"
+      - "/*.rst"
     sources:
       - &id051
         type: file

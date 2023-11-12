@@ -1,6 +1,6 @@
-diff -ruN whispercpp-org/CMakeLists.txt whispercpp-patched/CMakeLists.txt
---- whispercpp-org/CMakeLists.txt	2023-11-06 10:04:24.000000000 +0100
-+++ whispercpp-patched/CMakeLists.txt	2023-11-04 21:00:09.690370523 +0100
+diff -ruN whisper.cpp-org/CMakeLists.txt whisper.cpp-patched/CMakeLists.txt
+--- whisper.cpp-org/CMakeLists.txt	2023-11-12 05:40:36.000000000 +0100
++++ whisper.cpp-patched/CMakeLists.txt	2023-11-12 15:19:05.329230365 +0100
 @@ -170,39 +170,11 @@
  if (WHISPER_OPENBLAS)
      set(WHISPER_BLAS_VENDOR "OpenBLAS")
@@ -64,7 +64,7 @@ diff -ruN whispercpp-org/CMakeLists.txt whispercpp-patched/CMakeLists.txt
  
      find_package(hip)
      find_package(hipblas)
-@@ -245,9 +216,13 @@
+@@ -245,9 +216,20 @@
      if (${hipblas_FOUND} AND ${hip_FOUND})
          message(STATUS "HIP and hipBLAS found")
          add_compile_definitions(GGML_USE_HIPBLAS GGML_USE_CUBLAS)
@@ -76,10 +76,17 @@ diff -ruN whispercpp-org/CMakeLists.txt whispercpp-patched/CMakeLists.txt
          set_property(TARGET ggml-rocm PROPERTY POSITION_INDEPENDENT_CODE ON)
          set_source_files_properties(ggml-cuda.cu PROPERTIES LANGUAGE CXX)
 +
++        if (DEFINED CMAKE_HIP_ARCHITECTURES AND NOT CMAKE_HIP_ARCHITECTURES STREQUAL "")
++            message(STATUS "HIP architectures set to ${CMAKE_HIP_ARCHITECTURES}")
++            string(REPLACE " " " --offload-arch=" HIP_OPTS ${CMAKE_HIP_ARCHITECTURES})
++            set(HIP_OPTS "--offload-arch=${HIP_OPTS}")
++            set_target_properties(ggml-rocm PROPERTIES COMPILE_FLAGS ${HIP_OPTS})
++        endif()
++
          target_link_libraries(ggml-rocm PRIVATE hip::device PUBLIC hip::host roc::rocblas roc::hipblas)
  
          if (WHISPER_STATIC)
-@@ -521,10 +496,23 @@
+@@ -521,7 +503,11 @@
  
  if (GGML_SOURCES_CUDA)
      message(STATUS "GGML CUDA sources found, configuring CUDA architecture")
@@ -92,19 +99,14 @@ diff -ruN whispercpp-org/CMakeLists.txt whispercpp-patched/CMakeLists.txt
      set_property(TARGET whisper PROPERTY CUDA_SELECT_NVCC_ARCH_FLAGS "Auto")
  endif()
  
-+if (GGML_SOURCES_HIP)
-+    message(STATUS "GGML HIP sources found, configuring HIP architecture")
-+    if(NOT DEFINED CMAKE_HIP_ARCHITECTURES)
-+        set(CMAKE_HIP_ARCHITECTURES "gfx1030")
-+    endif()
-+    message(STATUS "HIP architectures set to ${CMAKE_HIP_ARCHITECTURES}")
-+    set_property(TARGET whisper PROPERTY HIP_ARCHITECTURES ${CMAKE_HIP_ARCHITECTURES})
-+endif()
-+
- if (EMSCRIPTEN)
-     set_target_properties(${TARGET} PROPERTIES COMPILE_FLAGS "-msimd128")
- endif()
-@@ -539,7 +527,7 @@
+@@ -533,13 +519,13 @@
+     ${WHISPER_EXTRA_FLAGS}
+     )
+ 
+-set_target_properties(${TARGET} PROPERTIES PUBLIC_HEADER "whisper.h")
++set_target_properties(${TARGET} PROPERTIES PUBLIC_HEADER "whisper.h;ggml.h")
+ 
+ include(GNUInstallDirs)
  
  install(TARGETS ${TARGET}
      LIBRARY  DESTINATION lib
@@ -113,9 +115,9 @@ diff -ruN whispercpp-org/CMakeLists.txt whispercpp-patched/CMakeLists.txt
      RUNTIME  DESTINATION bin
      RESOURCE DESTINATION bin
      PUBLIC_HEADER DESTINATION include
-diff -ruN whispercpp-org/ggml-quants.c whispercpp-patched/ggml-quants.c
---- whispercpp-org/ggml-quants.c	2023-11-06 10:04:24.000000000 +0100
-+++ whispercpp-patched/ggml-quants.c	2023-11-06 14:40:15.083032028 +0100
+diff -ruN whisper.cpp-org/ggml-quants.c whisper.cpp-patched/ggml-quants.c
+--- whisper.cpp-org/ggml-quants.c	2023-11-12 05:40:36.000000000 +0100
++++ whisper.cpp-patched/ggml-quants.c	2023-11-06 14:40:15.083032028 +0100
 @@ -349,11 +349,36 @@
      return res;
  }
