@@ -6,6 +6,9 @@ rename-desktop-file: dsnote.desktop
 rename-icon: dsnote
 rename-appdata-file: dsnote.metainfo.xml
 command: dsnote
+build-options:
+  strip: true
+  no-debuginfo: true
 finish-args:
   - --share=ipc
   - --share=network
@@ -21,6 +24,8 @@ finish-args:
   - --env=PYTORCH_TENSOREXPR=0
   - --env=LD_LIBRARY_PATH=/app/opt/cuda/lib64
   - --env=OPENCL_VENDOR_PATH=/app/opt/opencl/vendors
+  - --env=PERL5LIB=/app/lib/perl5/site_perl
+  - --talk-name=org.freedesktop.Notifications
 cleanup:
   - "/cmake"
   - "/etc"
@@ -30,13 +35,20 @@ cleanup:
   - "/lib/fst"
   - "/lib/cmake"
   - "/lib/pkgconfig"
+  - "/lib/python3.10/site-packages/nvidia*"
   - "/lib/python3.10/site-packages/cmake*"
+  - "/lib/python3.10/site-packages/git*"
+  - "/lib/python3.10/site-packages/Git*"
+  - "/lib/python3.10/site-packages/torch/test"
+  - "/lib/python3.10/site-packages/torch/include"
+  - "/lib/python3.10/site-packages/pypinyin/__pycache__"
+  - "/lib/python3.10/site-packages/pandas/tests"
+  - "/lib/python3.10/site-packages/torchvision*"
   - "/share/cmake"
   - "/share/doc"
   - "/share/locale"
   - "/share/man"
   - "/share/pkgconfig"
-  - "/share/rhvoice"
   - "/share/runtime"
   - "/share/vim"
   - "/share/ffmpeg"
@@ -46,8 +58,6 @@ cleanup:
   - "/bin/taglib*"
   - "/bin/spellout"
   - "*/cmake/*"
-  - "libboost*"
-  - "libRHVoice_audio*"
   - "pcre2*"
   - "xz*"
   - "unxz*"
@@ -120,6 +130,9 @@ modules:
     config-opts:
       - --with-pic
       - --with-pcaudiolib=no
+      - --with-sonic=no
+      - --with-speechplayer=no
+      - --with-mbrola=yes
       - --enable-static
     sources:
       - type: archive
@@ -171,62 +184,22 @@ modules:
         url: https://github.com/coqui-ai/STT/releases/download/v1.1.0/native_client.tflite.linux.aarch64.tar.xz
         sha256: 5c8ce5e4bb2d8fa55f5a6ac58103d9aee6a080369bc99cd5910d2615783e1ba3
 
-  - name: openfst
-    buildsystem: autotools
-    config-opts:
-      - --disable-bin
-      - --disable-dependency-tracking
-      - --enable-compact-fsts
-      - --enable-compress
-      - --enable-const-fsts
-      - --enable-far
-      - --enable-linear-fsts
-      - --enable-lookahead-fsts
-      - --enable-mpdt
-      - --enable-ngram-fsts
-      - --enable-pdt
-      - --disable-shared
-      - --enable-static
-      - --with-pic
-    sources:
-      - type: archive
-        url: https://github.com/alphacep/openfst/archive/7dfd808194105162f20084bb4d8e4ee4b65266d5.zip
-        sha256: f485ccd89bdaee328c862f786af9676a9e1dff5076aa35d8b096b6498e344f0d
-      - type: shell
-        commands:
-          - "autoreconf -fi"
-
-  - name: kaldi
-    buildsystem: cmake-ninja
-    config-opts:
-      - -DCMAKE_BUILD_TYPE=Release
-      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-      - -DBUILD_SHARED_LIBS=OFF
-      - -DKALDI_BUILD_EXE=OFF
-      - -DKALDI_BUILD_TEST=OFF
-      - -DKALDI_VERSION=1
-      - -DENABLE_CUDA=OFF
-      - -DCMAKE_CXX_FLAGS='-O3'
-    sources:
-      - type: archive
-        url: https://github.com/alphacep/kaldi/archive/2abed6b15990d9438f70863f2b58bd8af8432043.zip
-        sha256: 24021fcfa542499e203e21fcba8486832ca79821ad7ea514836e9f3e917495fe
-      - type: patch
-        path: patches/kaldi.patch
-
   - name: vosk
-    buildsystem: cmake-ninja
-    config-opts:
-      - -DCMAKE_BUILD_TYPE=Release
-      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-      - -DCMAKE_CXX_FLAGS='-O3 -I$$CPLUS_INCLUDE_PATH/kaldi'
-      - -DCMAKE_LIBRARY_PATH=/app/lib
+    buildsystem: simple
+    build-commands:
+      - "cp ./libvosk.so /app/lib"
+      - "cp ./vosk_api.h /app/include"
     sources:
       - type: archive
-        url: https://github.com/alphacep/vosk-api/archive/128c216c6137a36fbf5b0bf64d03501e91a6eeaa.zip
-        sha256: d189af92ae53af1e3f0604fc39542a13da0add2f821f21aa33e9fb8bb4b0a46e
-      - type: patch
-        path: patches/vosk.patch
+        only-arches:
+          - x86_64
+        url: https://github.com/alphacep/vosk-api/releases/download/v0.3.45/vosk-linux-x86_64-0.3.45.zip
+        sha256: bbdc8ed85c43979f6443142889770ea95cbfbc56cffb5c5dcd73afa875c5fbb2
+      - type: archive
+        only-arches:
+          - aarch64
+        url: https://github.com/alphacep/vosk-api/releases/download/v0.3.45/vosk-linux-aarch64-0.3.45.zip
+        sha256: 45e95d37755deb07568e79497d7feba8c03aee5a9e071df29961aa023fd94541
 
   - name: onnx
     buildsystem: simple
@@ -237,13 +210,13 @@ modules:
       - type: archive
         only-arches:
           - x86_64
-        url: https://github.com/microsoft/onnxruntime/releases/download/v1.14.1/onnxruntime-linux-x64-1.14.1.tgz
-        sha256: 010585f534d822bf02d54c7cfc53b57aa3eb0cf34f8fb7503ee519ed18e25d29
+        url: https://github.com/microsoft/onnxruntime/releases/download/v1.16.1/onnxruntime-linux-x64-1.16.1.tgz
+        sha256: 53a0f03f71587ed602e99e82773132fc634b74c2d227316fbfd4bf67181e72ed
       - type: archive
         only-arches:
           - aarch64
-        url: https://github.com/microsoft/onnxruntime/releases/download/v1.14.1/onnxruntime-linux-aarch64-1.14.1.tgz
-        sha256: 20965e05d2da6a0e6acedda8aca1a8f75c3f4cb1d7932403a9977b753b1b2120
+        url: https://github.com/microsoft/onnxruntime/releases/download/v1.16.1/onnxruntime-linux-aarch64-1.16.1.tgz
+        sha256: f10851b62eb44f9e811134737e7c6edd15733d2c1549cb6ce403808e9c047385
 
   - name: piperphonemize
     buildsystem: cmake-ninja
@@ -319,6 +292,16 @@ modules:
       - --disable-shared
       - --enable-static
       - --with-pic
+      # adding prefix rnnoise_ to avoid symbol collision with libopus
+      - >
+        CFLAGS=-Dpitch_downsample=rnnoise_pitch_downsample
+        -Dpitch_search=rnnoise_pitch_search
+        -Dremove_doubling=rnnoise_remove_doubling
+        -D_celt_lpc=rnnoise__celt_lpc
+        -Dcelt_iir=rnnoise_celt_iir
+        -D_celt_autocorr=rnnoise__celt_autocorr
+        -Dcompute_gru=rnnoise_compute_gru
+        -Dcompute_dense=rnnoise_compute_dense
     sources:
       - type: archive
         url: https://github.com/GregorR/rnnoise-nu/archive/26269304e120499485438cd93acf5127c6908c68.zip
@@ -341,6 +324,10 @@ modules:
       - "mkdir -p /app/share/rhvoice"
       - "cp -R data /app/share/rhvoice"
       - "cp -R config /app/share/rhvoice"
+    cleanup:
+      - "libboost*"
+      - "libRHVoice_audio*"
+      - "/share/rhvoice"
     sources:
       - type: git
         url: https://github.com/RHVoice/RHVoice.git
@@ -398,91 +385,6 @@ modules:
       - type: patch
         path: patches/bergamot.patch
 
-  - name: perl
-    only-arches:
-      - x86_64
-    buildsystem: autotools
-    no-autogen: true
-    config-opts:
-      - -des
-    post-install:
-      - "chmod -R 755 /app/lib/perl5/5.38.0/x86_64-linux"
-    cleanup:
-      - /bin/c*
-      - /bin/e*
-      - /bin/h*
-      - /bin/i*
-      - /bin/j*
-      - /bin/l*
-      - /bin/perl5*
-      - /bin/perlb*
-      - /bin/perld*
-      - /bin/perli*
-      - /bin/perlt*
-      - /bin/pi*
-      - /bin/pl*
-      - /bin/po*
-      - /bin/pr*
-      - /bin/pt*
-      - /bin/s*
-      - /bin/x*
-      - /bin/z*
-    sources:
-      - type: archive
-        url: https://www.cpan.org/src/5.0/perl-5.38.0.tar.gz
-        sha256: 213ef58089d2f2c972ea353517dc60ec3656f050dcc027666e118b508423e517
-      - type: script
-        dest-filename: configure
-        commands:
-          - exec ./configure.gnu $@
-
-  - name: uroman
-    only-arches:
-      - x86_64
-    buildsystem: simple
-    build-commands:
-      - "mkdir -p /app/share/uroman"
-      - "cp -r ./bin /app/share/uroman"
-      - "cp -r ./data /app/share/uroman"
-      - "cp -r ./lib /app/share/uroman"
-    sources:
-      - type: archive
-        url: https://github.com/isi-nlp/uroman/archive/refs/tags/v1.2.8.tar.gz
-        sha256: 08e5058341428f3f4ca2401d409df1f4341c386853c4de836e7ab2c2a750cb88
-
-  - name: samplerate
-    only-arches:
-      - x86_64
-    buildsystem: cmake-ninja
-    config-opts:
-      - -DCMAKE_BUILD_TYPE=Release
-      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-      - -DBUILD_SHARED_LIBS=OFF
-    sources:
-      - type: archive
-        url: https://github.com/libsndfile/libsamplerate/releases/download/0.2.2/libsamplerate-0.2.2.tar.xz
-        sha256: 3258da280511d24b49d6b08615bbe824d0cacc9842b0e4caf11c52cf2b043893
-
-  - name: sleef
-    only-arches:
-      - x86_64
-    buildsystem: cmake-ninja
-    builddir: true
-    config-opts:
-      - -DCMAKE_BUILD_TYPE=Release
-      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-      - -DBUILD_SHARED_LIBS=OFF
-      - -DDISABLE_FFTW=ON
-      - -DDISABLE_MPFR=ON
-      - -DDISABLE_SSL=ON
-      - -DBUILD_TESTS=OFF
-      - -DBUILD_GNUABI_LIBS=OFF
-      - -DBUILD_DFT=ON
-    sources:
-      - type: archive
-        url: https://github.com/shibatch/sleef/archive/85440a5e87dae36ca1b891de14bc83b441ae7c43.zip
-        sha256: 9760b476af68182c8ffa40fd1809ce3f2a044a5f3057ff4dfa8d71737d8ffe16
-
   - name: rubberband
     only-arches:
       - x86_64
@@ -491,8 +393,8 @@ modules:
       - --buildtype=release
       - -Dauto_features=disabled
       - -Ddefault_library=static
-      - -Dresampler=libsamplerate
-      - -Dfft=sleef
+      - -Dresampler=builtin
+      - -Dfft=builtin
     sources:
       - type: archive
         url: https://breakfastquay.com/files/releases/rubberband-3.3.0.tar.bz2
@@ -543,6 +445,16 @@ modules:
         url: https://altushost-swe.dl.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz
         sha256: ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e
 
+  - name: opus
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+    sources:
+      - type: archive
+        url: https://downloads.xiph.org/releases/opus/opus-1.4.tar.gz
+        sha256: c9b32b4253be5ae63d1ff16eea06b94b5f0f2951b7a02aceef58e3a3ce49c51f
+
   - name: ffmpeg
     buildsystem: autotools
     config-opts:
@@ -562,6 +474,8 @@ modules:
       - --enable-encoder=libmp3lame
       - --enable-encoder=libvorbis
       - --enable-encoder=pcm_s16le
+      - --enable-encoder=libopus
+      - --enable-encoder=flac
       - --enable-decoder=pcm_u8
       - --enable-decoder=pcm_u32le
       - --enable-decoder=pcm_u32be
@@ -591,9 +505,11 @@ modules:
       - --enable-decoder=mp3on4float
       - --enable-decoder=libvorbis
       - --enable-decoder=flac
+      - --enable-decoder=libopus
       - --enable-muxer=mp3
       - --enable-muxer=ogg
       - --enable-muxer=wav
+      - --enable-muxer=flac
       - --enable-demuxer=aac
       - --enable-demuxer=mp3
       - --enable-demuxer=mov
@@ -607,6 +523,7 @@ modules:
       - --enable-parser=ac3
       - --enable-libmp3lame
       - --enable-libvorbis
+      - --enable-libopus
       - --extra-libs=-lvorbis -logg -lm
     sources:
       - type: archive
@@ -645,8 +562,15 @@ modules:
         - "mv /app/lib/libwhisper.so /app/lib/libwhisper-openblas.so"
     sources:
       - type: archive
-        url: https://github.com/ggerganov/whisper.cpp/archive/951a1199265ff4424f938182542cf6bac9b36154.zip
-        sha256: cdbbaa45c50e6b12df933d7a5e914477edb918622d73d159dbec0867f5da2f63
+        only-arches:
+          - x86_64
+        url: https://github.com/ggerganov/whisper.cpp/archive/684bc8bd7033bf870f4a1cf977719bb7c43fa9b9.zip
+        sha256: 292f5b51ee101be10b653c223ba19237d8ae02d7fc6a9a2ea0f5708bcd63802f
+      - type: archive
+        only-arches:
+          - aarch64
+        url: https://github.com/ggerganov/whisper.cpp/archive/refs/tags/v1.4.3.tar.gz
+        sha256: 5f11c0542639bfb0b3c9d1b033d10ccd69ca26e739aec9366766617bc58a6e7c
       - type: patch
         path: patches/whispercpp.patch
 
@@ -670,8 +594,15 @@ modules:
       - "mv /app/lib/libwhisper.so /app/lib/libwhisper-fallback.so"
     sources:
       - type: archive
-        url: https://github.com/ggerganov/whisper.cpp/archive/951a1199265ff4424f938182542cf6bac9b36154.zip
-        sha256: cdbbaa45c50e6b12df933d7a5e914477edb918622d73d159dbec0867f5da2f63
+        only-arches:
+          - x86_64
+        url: https://github.com/ggerganov/whisper.cpp/archive/684bc8bd7033bf870f4a1cf977719bb7c43fa9b9.zip
+        sha256: 292f5b51ee101be10b653c223ba19237d8ae02d7fc6a9a2ea0f5708bcd63802f
+      - type: archive
+        only-arches:
+          - aarch64
+        url: https://github.com/ggerganov/whisper.cpp/archive/refs/tags/v1.4.3.tar.gz
+        sha256: 5f11c0542639bfb0b3c9d1b033d10ccd69ca26e739aec9366766617bc58a6e7c
       - type: patch
         path: patches/whispercpp.patch
 
@@ -714,77 +645,8 @@ modules:
       - "mv /app/lib/libwhisper.so /app/lib/libwhisper-clblast.so"
     sources:
       - type: archive
-        url: https://github.com/ggerganov/whisper.cpp/archive/951a1199265ff4424f938182542cf6bac9b36154.zip
-        sha256: cdbbaa45c50e6b12df933d7a5e914477edb918622d73d159dbec0867f5da2f63
-      - type: patch
-        path: patches/whispercpp.patch
-
-  - name: cuda
-    only-arches:
-      - x86_64
-    buildsystem: simple
-    build-commands:
-      - mkdir cuda_src
-      - sh cuda_12.2.2_535.104.05_linux.run --target cuda_src --noexec
-      - cd cuda_src/builds && rm -rf NVIDIA*.run bin EULA.txt version.json cuda_sanitizer_api integration nsight_compute nsight_systems cuda_gdb cuda_documentation
-      - mkdir -p /app/opt/cuda
-      - cd cuda_src/builds && for lib in *; do echo "copying $lib/* => /app/opt/cuda/" && if [ -d $lib ]; then cp -r $lib/* /app/opt/cuda/; else cp $lib /app/opt/cuda/; fi; done
-    cleanup:
-      - "/opt/cuda/bin"
-      - "/opt/cuda/extras"
-      - "/opt/cuda/extras"
-      - "/opt/cuda/gds*"
-      - "/opt/cuda/include"
-      - "/opt/cuda/libnvvp"
-      - "/opt/cuda/nsight*"
-      - "/opt/cuda/nv*"
-      - "/opt/cuda/pkg-config"
-      - "/opt/cuda/src"
-      - "/opt/cuda/usr"
-      - "/opt/cuda/cublas_version.txt"
-      - "/opt/cuda/LICENSE"
-      - "/opt/cuda/targets/x86_64-linux/lib/cmake"
-      - "/opt/cuda/targets/x86_64-linux/lib/lib64"
-      - "/opt/cuda/targets/x86_64-linux/lib/libOpenCL.so*"
-      - "/opt/cuda/targets/x86_64-linux/lib/libcusparse.so*"
-      - "/opt/cuda/targets/x86_64-linux/lib/libcufft*.so*"
-      - "/opt/cuda/targets/x86_64-linux/lib/libcusolver.so*"
-      - "/opt/cuda/targets/x86_64-linux/lib/libcurand.so*"
-      - "/opt/cuda/targets/x86_64-linux/lib/libnppif.so*"
-      - "/opt/cuda/targets/x86_64-linux/lib/libcusolverMg.so*"
-      - "/opt/cuda/targets/x86_64-linux/lib/libn*.so*"
-      - "/opt/cuda/targets/x86_64-linux/lib/libcufile*.so*"
-      - "/opt/cuda/targets/x86_64-linux/lib/libcuinj64.so*"
-      - "/opt/cuda/targets/x86_64-linux/lib/libaccinj64.so*"
-      - "/opt/cuda/targets/x86_64-linux/include"
-      - "/opt/cuda/targets/x86_64-linux/res"
-    sources:
-      - type: file
-        url: https://developer.download.nvidia.com/compute/cuda/12.2.2/local_installers/cuda_12.2.2_535.104.05_linux.run
-        sha256: 2b39aae3e7618d9f59a3c8fa1f1bc61f29c0b0e0df75fb05076badb352952ef2
-
-  - name: whispercpp-cublas
-    only-arches:
-      - x86_64
-    buildsystem: cmake-ninja
-    config-opts:
-      - -DCMAKE_BUILD_TYPE=Release
-      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-      - -DBUILD_SHARED_LIBS=ON
-      - -DWHISPER_BUILD_TESTS=OFF
-      - -DWHISPER_BUILD_EXAMPLES=OFF
-      - -DWHISPER_CUBLAS=ON
-      - -DCMAKE_C_FLAGS='-O3'
-      - -DCMAKE_CXX_FLAGS='-O3'
-      - -DCUDAToolkit_ROOT=/app/opt/cuda
-      - -DCMAKE_CUDA_COMPILER=/app/opt/cuda/bin/nvcc
-      - -DCMAKE_CUDA_ARCHITECTURES=60;61;62;70;72;75;80;86;87;89;90
-    post-install:
-      - "mv /app/lib/libwhisper.so /app/lib/libwhisper-cublas.so"
-    sources:
-      - type: archive
-        url: https://github.com/ggerganov/whisper.cpp/archive/951a1199265ff4424f938182542cf6bac9b36154.zip
-        sha256: cdbbaa45c50e6b12df933d7a5e914477edb918622d73d159dbec0867f5da2f63
+        url: https://github.com/ggerganov/whisper.cpp/archive/684bc8bd7033bf870f4a1cf977719bb7c43fa9b9.zip
+        sha256: 292f5b51ee101be10b653c223ba19237d8ae02d7fc6a9a2ea0f5708bcd63802f
       - type: patch
         path: patches/whispercpp.patch
 
@@ -801,8 +663,6 @@ modules:
       - type: shell
         commands:
           - "autoreconf -fi"
-
-  - python3-modules-x86-64.yaml
 
   - name: rocm-opencl
     only-arches:
@@ -870,6 +730,157 @@ modules:
         url: https://github.com/numactl/numactl/releases/download/v2.0.16/numactl-2.0.16.tar.gz
         sha256: 1b242f893af977a1d31af6ce9d6b8dafdd2d8ec3dc9207f7c2dc0d3446e7c7c8
 
+  - name: qhotkey
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+    sources:
+      - type: archive
+        url: https://github.com/Skycoder42/QHotkey/archive/cd72a013275803fce33e028fc8b05ae32248da1f.zip
+        sha256: 55995114e8b5947cb6a59a19a53840eaf81fddc420fd3d180dcb0db9d8d33e13
+
+  - name: cuda
+    only-arches:
+      - x86_64
+    buildsystem: simple
+    build-commands:
+      - sh cuda_11.7.1_515.65.01_linux.run --target . --noexec
+      - rm -rf builds/*.* && rm -rf builds/bin builds/cuda_sanitizer_api builds/integration builds/nsight_compute builds/nsight_systems builds/cuda_gdb builds/cuda_documentation
+      - mkdir -p /app/opt/cuda
+      - cd builds && for lib in *; do echo "copying $lib/* => /app/opt/cuda/" && if [ -d $lib ]; then cp -r $lib/* /app/opt/cuda/; else cp -P $lib /app/opt/cuda/; fi; done
+      - cd builds/cuda_cupti/extras/CUPTI/lib64/ && for lib in libcupti.so*; do echo "copying $lib/* => /app/opt/cuda/lib64/" && cp -P $lib /app/opt/cuda/lib64/; done
+    cleanup:
+      - "/opt/cuda/bin"
+      - "/opt/cuda/extras"
+      - "/opt/cuda/extras"
+      - "/opt/cuda/gds*"
+      - "/opt/cuda/include"
+      - "/opt/cuda/libnvvp"
+      - "/opt/cuda/nsight*"
+      - "/opt/cuda/nv*"
+      - "/opt/cuda/pkg-config"
+      - "/opt/cuda/src"
+      - "/opt/cuda/usr"
+      - "/opt/cuda/cublas_version.txt"
+      - "/opt/cuda/LICENSE"
+      - "/opt/cuda/targets/x86_64-linux/lib/cmake"
+      - "/opt/cuda/targets/x86_64-linux/lib/lib64"
+      - "/opt/cuda/targets/x86_64-linux/lib/libOpenCL.so*"
+      - "/opt/cuda/targets/x86_64-linux/lib/libcusolver.so*"
+      - "/opt/cuda/targets/x86_64-linux/lib/libnppif.so*"
+      - "/opt/cuda/targets/x86_64-linux/lib/libcusolverMg.so*"
+      - "/opt/cuda/targets/x86_64-linux/lib/libcufile*.so*"
+      - "/opt/cuda/targets/x86_64-linux/lib/libcuinj64.so*"
+      - "/opt/cuda/targets/x86_64-linux/lib/libaccinj64.so*"
+      - "/opt/cuda/targets/x86_64-linux/include"
+      - "/opt/cuda/targets/x86_64-linux/res"
+    sources:
+      - type: file
+        url: https://developer.download.nvidia.com/compute/cuda/11.7.1/local_installers/cuda_11.7.1_515.65.01_linux.run
+        sha256: 52286a29706549b7d0feeb0e7e3eca1b15287c436a69fa880ad385b1be3e04db
+
+  - name: whispercpp-cublas
+    only-arches:
+      - x86_64
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+      - -DBUILD_SHARED_LIBS=ON
+      - -DWHISPER_BUILD_TESTS=OFF
+      - -DWHISPER_BUILD_EXAMPLES=OFF
+      - -DWHISPER_CUBLAS=ON
+      - -DCMAKE_C_FLAGS='-O3'
+      - -DCMAKE_CXX_FLAGS='-O3'
+      - -DCMAKE_CUDA_FLAGS=' -allow-unsupported-compiler'
+      - -DCUDAToolkit_ROOT=/app/opt/cuda
+      - -DCMAKE_CUDA_COMPILER=/app/opt/cuda/bin/nvcc
+      - -DCMAKE_CUDA_ARCHITECTURES=50;52;53;60;61;62;70;72;75;80;86;87
+    post-install:
+      - "mv /app/lib/libwhisper.so /app/lib/libwhisper-cublas.so"
+    sources:
+      - type: archive
+        url: https://github.com/ggerganov/whisper.cpp/archive/684bc8bd7033bf870f4a1cf977719bb7c43fa9b9.zip
+        sha256: 292f5b51ee101be10b653c223ba19237d8ae02d7fc6a9a2ea0f5708bcd63802f
+      - type: patch
+        path: patches/whispercpp.patch
+
+  - name: april-asr
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+    sources:
+      - type: archive
+        url: https://github.com/abb128/april-asr/archive/3308e68442664552de593957cad0fa443ea183dd.zip
+        sha256: 0640fc16a43018afb1db9f17e93f545d7ac1f07e4bc47ba318d2c7311bef2df5
+
+  - name: cudnn
+    only-arches:
+      - x86_64
+    buildsystem: simple
+    cleanup:
+      - /opt/cuda/targets/x86_64-linux/lib/libcudnn_*train*
+    build-commands:
+      - ar x cudnn-local-repo-ubuntu2204-8.8.0.121_1.0-1_amd64.deb && rm control.tar.* && rm debian-binary && rm *.deb
+      - tar -xf data.tar.* && rm data.tar.*
+      - mv var/cudnn-local-repo-ubuntu2204-8.8.0.121/libcudnn8_8.8.0.121-1+cuda11.8_amd64.deb libcudnn.deb && rm -rf var
+      - ar x libcudnn.deb && rm control.tar.* && rm debian-binary && rm *.deb
+      - tar -xf data.tar.* && rm data.tar.*
+      - cd usr/lib/x86_64-linux-gnu && for lib in *; do echo "copying $lib/* => /app/opt/cuda/lib64/" && if [ -d $lib ]; then cp -r $lib/* /app/opt/cuda/lib64/; else cp -P $lib /app/opt/cuda/lib64/; fi; done
+    sources:
+      - type: file
+        url: https://developer.download.nvidia.com/compute/redist/cudnn/v8.8.0/local_installers/11.8/cudnn-local-repo-ubuntu2204-8.8.0.121_1.0-1_amd64.deb
+        sha256: 9620283cdd4fa23dc359762470bc13aeb66115357234c1bd0250693a8403a127
+
+  - name: nccl
+    only-arches:
+      - x86_64
+    buildsystem: simple
+    build-commands:
+      - ar x libnccl2_2.18.5-1-1_amd64.deb && rm control.tar.* && rm debian-binary && rm *.deb
+      - tar -xf data.tar.* && rm data.tar.*
+      - cd usr/lib/x86_64-linux-gnu && for lib in *; do echo "copying $lib/* => /app/opt/cuda/lib64/" && if [ -d $lib ]; then cp -r $lib/* /app/opt/cuda/lib64/; else cp -P $lib /app/opt/cuda/lib64/; fi; done
+    sources:
+      - type: file
+        url: http://http.us.debian.org/debian/pool/contrib/n/nvidia-nccl/libnccl2_2.18.5-1-1_amd64.deb
+        sha256: e577f0edf02d8c3983c718c30453e990250a25627400ac90173e9c8df1afdddd
+
+  - name: uroman
+    only-arches:
+      - x86_64
+    buildsystem: simple
+    build-commands:
+      - "mkdir -p /app/share/uroman"
+      - "cp -r ./bin /app/share/uroman"
+      - "cp -r ./data /app/share/uroman"
+      - "cp -r ./lib /app/share/uroman"
+    sources:
+      - type: archive
+        url: https://github.com/isi-nlp/uroman/archive/refs/tags/v1.2.8.tar.gz
+        sha256: 08e5058341428f3f4ca2401d409df1f4341c386853c4de836e7ab2c2a750cb88
+
+  - name: perl
+    only-arches:
+      - x86_64
+    buildsystem: simple
+    build-commands:
+      - ./configure -des
+      - make -j${FLATPAK_BUILDER_N_JOBS}
+      - cp perl /app/bin/
+      - mkdir -p /app/lib/perl5/site_perl
+      - cp -r lib/* /app/lib/perl5/site_perl/
+    sources:
+      - type: archive
+        url: https://www.cpan.org/src/5.0/perl-5.38.0.tar.gz
+        sha256: 213ef58089d2f2c972ea353517dc60ec3656f050dcc027666e118b508423e517
+      - type: script
+        dest-filename: configure
+        commands:
+          - exec ./configure.gnu $@
+
+  - python3-modules-x86-64.yaml
+
   - name: dsnote
     buildsystem: cmake-ninja
     config-opts:
@@ -897,6 +908,8 @@ modules:
       - -DBUILD_FFMPEG=OFF
       - -DBUILD_TAGLIB=OFF
       - -DBUILD_LIBNUMBERTEXT=OFF
+      - -DBUILD_QHOTKEY=OFF
+      - -DBUILD_APRILASR=OFF
     build-options:
       arch:
         aarch64:
@@ -905,4 +918,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: 8259fa7ba19e5bec97f2f82176ac73205ddcae70
+        commit: d883c54d9944189313dd8ec3771b6418f62d12c0
