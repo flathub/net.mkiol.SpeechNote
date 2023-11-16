@@ -15,7 +15,6 @@ finish-args:
   - --socket=fallback-x11
   - --socket=wayland
   - --socket=pulseaudio
-  - --device=all
   - --filesystem=xdg-desktop
   - --filesystem=xdg-download
   - --filesystem=xdg-music
