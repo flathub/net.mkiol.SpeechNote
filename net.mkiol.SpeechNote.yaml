@@ -71,6 +71,8 @@ add-extensions:
     no-autodownload: true
     autodelete: true
     subdirectories: true
+    version: stable
+    versions: stable;beta;test;master
 modules:
   - name: fmt
     buildsystem: cmake-ninja
@@ -885,4 +887,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: e28a78d1d6683008adfe9fee0c77b45774e3a4a5
+        commit: ec7b4b2af6c43098310f4634d91ecc903f22fd90
