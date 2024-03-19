@@ -145,6 +145,18 @@ diff -ruN whispercpp-org/CMakeLists.txt whispercpp-patched/CMakeLists.txt
      RUNTIME  DESTINATION bin
      RESOURCE DESTINATION bin
      PUBLIC_HEADER DESTINATION include
+diff -ruN whispercpp-org/ggml-cuda.cu whispercpp-patched/ggml-cuda.cu
+--- whispercpp-org/ggml-cuda.cu	2024-01-05 16:11:27.000000000 +0100
++++ whispercpp-patched/ggml-cuda.cu	2024-03-15 19:17:37.976067547 +0100
+@@ -6811,7 +6811,7 @@
+ #ifdef __HIP_PLATFORM_AMD__
+         // Workaround for a rocBLAS bug when using multiple graphics cards:
+         // https://github.com/ROCmSoftwarePlatform/rocBLAS/issues/1346
+-        rocblas_initialize();
++        // rocblas_initialize();
+         CUDA_CHECK(cudaDeviceSynchronize());
+ #endif
+ 
 diff -ruN whispercpp-org/ggml-quants.c whispercpp-patched/ggml-quants.c
 --- whispercpp-org/ggml-quants.c	2024-01-05 16:11:27.000000000 +0100
 +++ whispercpp-patched/ggml-quants.c	2024-01-07 15:43:52.296262202 +0100
