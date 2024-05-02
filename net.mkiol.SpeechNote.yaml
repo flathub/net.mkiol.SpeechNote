@@ -97,8 +97,8 @@ modules:
             - -DTARGET=ARMV8
     sources:
       - type: archive
-        url: https://github.com/xianyi/OpenBLAS/releases/download/v0.3.21/OpenBLAS-0.3.21.tar.gz
-        sha256: f36ba3d7a60e7c8bcc54cd9aaa9b1223dd42eaf02c811791c37e8ca707c241ca
+        url: https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.26/OpenBLAS-0.3.26.tar.gz
+        sha256: 4e6e4f5cb14c209262e33e6816d70221a2fe49eb69eaf0a06f065598ac602c68
 
   - name: mbrola
     buildsystem: simple
@@ -325,7 +325,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/RHVoice/RHVoice.git
-        commit: 527d914ab60ebcdeb297c8393f699300d4c731c4
+        commit: 3ba2a849c14e547d54f111b53fc39e484939f66c
       - type: patch
         path: patches/rhvoice.patch
 
@@ -846,4 +846,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: 9e499c87073acb19550f5b2fc73abe8a531fb2bd
+        commit: 8442c911ebe2767ac4e381aafe5fb6072b343dc2
