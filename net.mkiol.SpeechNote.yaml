@@ -383,7 +383,7 @@ modules:
         url: https://github.com/browsermt/bergamot-translator.git
         commit: ada8c3922490cc6a507bcf81fa4882b435595323
       - type: patch
-        path: .patches/bergamot.patch
+        path: patches/bergamot.patch
 
   - name: rubberband
     buildsystem: meson
