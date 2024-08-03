@@ -325,7 +325,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/RHVoice/RHVoice.git
-        commit: d8eaec0b49e018c7e551d7544603b24cd0913a90
+        commit: 71a1a830d2d860688ffcbb0d27d4de260136d161
       - type: patch
         path: patches/rhvoice.patch
 
@@ -339,10 +339,10 @@ modules:
       - -DBLAS_LIB_PATH=/app/lib/libopenblas.so
       - -DBLAS_INC_DIR=/app/include/openblas
       - -DUSE_INTRINSICS_SSE2=ON
-      - -DUSE_INTRINSICS_SSE3=OFF
-      - -DUSE_INTRINSICS_SSE41=OFF
+      - -DUSE_INTRINSICS_SSE3=ON
+      - -DUSE_INTRINSICS_SSE41=ON
       - -DUSE_INTRINSICS_SSE42=OFF
-      - -DUSE_INTRINSICS_AVX=ON
+      - -DUSE_INTRINSICS_AVX=OFF
       - -DUSE_INTRINSICS_AVX2=OFF
       - -DUSE_INTRINSICS_AVX512=OFF
       - -DBUILD_ARCH=x86-64
@@ -362,6 +362,12 @@ modules:
       - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
       - -DBLAS_LIB_PATH=/app/lib/libopenblas.so
       - -DBLAS_INC_DIR=/app/include/openblas
+      - -DUSE_INTRINSICS_SSE2=ON
+      - -DUSE_INTRINSICS_SSE3=ON
+      - -DUSE_INTRINSICS_SSE41=ON
+      - -DUSE_INTRINSICS_SSE42=ON
+      - -DUSE_INTRINSICS_AVX=ON
+      - -DUSE_INTRINSICS_AVX2=OFF
       - -DUSE_INTRINSICS_AVX512=OFF
       - -DUSE_INTRINSICS_ARMV7_NEONVFPV4=ON
     build-options:
@@ -916,4 +922,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: 2796f74331efbd510f7057cfa958396f15aec984
+        commit: e9ea20e153dfd10cd684405dd81c6bf86bc0e34d
