@@ -20,7 +20,7 @@ finish-args:
   - --filesystem=xdg-videos
   - --env=PYTORCH_TENSOREXPR=0
   - --env=PYTHONPATH=/app/extensions/nvidia/lib/python3.11/site-packages:/app/extensions/amd/lib/python3.11/site-packages:/app/extensions/cpu/lib/python3.11/site-packages:/app/lib/python3.11/site-packages
-  - --env=LD_LIBRARY_PATH=/app/opt/intel/lib:/app/extensions/nvidia/lib:/app/extensions/amd/lib:/app/extensions/cpu/lib:/app/extensions/nvidia/cuda/lib64:/app/extensions/amd/rocm/lib
+  - --env=LD_LIBRARY_PATH=/app/opt/intel/lib:/app/extensions/nvidia/lib:/app/extensions/amd/lib:/app/extensions/cpu/lib:/app/extensions/nvidia/cuda/lib64:/app/extensions/amd/rocm/lib:/app/extensions/amd/rocm/lib/llvm/lib:/app/extensions/amd/zluda
   - --env=OPENCL_VENDOR_PATH=/app/opt/opencl/vendors
   - --env=PERL5LIB=/app/lib/perl5/site_perl
   - --env=QT_QUICK_CONTROLS_HOVER_ENABLED=1
@@ -44,6 +44,8 @@ cleanup:
   - /lib/python3.11/site-packages/pypinyin/__pycache__
   - /lib/python3.11/site-packages/pandas/tests
   - /lib/python3.11/site-packages/torchvision*
+  - /lib/libSPIRV*
+  - /lib/libshaderc*
   - /lib/debug/opt
   - /share/cmake
   - /share/doc
@@ -55,6 +57,8 @@ cleanup:
   - /share/ffmpeg
   - /share/aclocal
   - /bin/spellout
+  - /bin/vulkan*
+  - /bin/speak*
   - "*.a"
   - "*.la"
 add-extensions:
@@ -499,8 +503,8 @@ modules:
       - --extra-libs=-lvorbis -logg -lm
     sources:
       - type: archive
-        url: https://ffmpeg.org/releases/ffmpeg-6.1.1.tar.xz
-        sha256: 8684f4b00f94b85461884c3719382f1261f0d9eb3d59640a1f4ac0873616f968
+        url: https://ffmpeg.org/releases/ffmpeg-7.1.tar.xz
+        sha256: 40973d44970dbc83ef302b0609f2e74982be2d85916dd2ee7472d30678a7abe6
       - type: patch
         path: patches/ffmpeg.patch
 
@@ -508,19 +512,23 @@ modules:
     buildsystem: cmake-ninja
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
-      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+      - -DGGML_NATIVE=OFF
+      - -DGGML_BLAS=ON
+      - -DGGML_BLAS_VENDOR=OpenBLAS
+      - -DGGML_AVX=ON
+      - -DGGML_AVX2=ON
+      - -DGGML_FMA=ON
+      - -DGGML_F16C=ON
       - -DBUILD_SHARED_LIBS=ON
       - -DWHISPER_BUILD_TESTS=OFF
       - -DWHISPER_BUILD_EXAMPLES=OFF
-      - -DWHISPER_OPENBLAS=ON
+      - -DCMAKE_C_FLAGS=-O3
+      - -DCMAKE_CXX_FLAGS=-O3
       - -DWHISPER_TARGET_NAME=whisper-openblas
-      - -DBLAS_LIB_PATH=/app/lib/libopenblas.so
-      - -DCMAKE_C_FLAGS='-O3 -I$$C_INCLUDE_PATH/openblas'
-      - -DCMAKE_CXX_FLAGS='-O3 -I$$CPLUS_INCLUDE_PATH/openblas'
     sources:
       - type: archive
-        url: https://github.com/ggerganov/whisper.cpp/archive/refs/tags/v1.6.2.tar.gz
-        sha256: da7988072022acc3cfa61b370b3c51baad017f1900c3dc4e68cb276499f66894
+        url: https://github.com/ggerganov/whisper.cpp/archive/refs/tags/v1.7.1.tar.gz
+        sha256: 97f19a32212f2f215e538ee37a16ff547aaebc54817bd8072034e02466ce6d55
       - type: patch
         path: patches/whispercpp.patch
 
@@ -530,45 +538,49 @@ modules:
     buildsystem: cmake-ninja
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
-      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+      - -DGGML_NATIVE=OFF
+      - -DGGML_BLAS=ON
+      - -DGGML_BLAS_VENDOR=OpenBLAS
+      - -DGGML_AVX=ON
+      - -DGGML_AVX2=OFF
+      - -DGGML_FMA=OFF
+      - -DGGML_F16C=ON
       - -DBUILD_SHARED_LIBS=ON
       - -DWHISPER_BUILD_TESTS=OFF
       - -DWHISPER_BUILD_EXAMPLES=OFF
-      - -DWHISPER_OPENBLAS=ON
-      - -DWHISPER_NO_AVX2=ON
-      - -DWHISPER_NO_FMA=ON
+      - -DCMAKE_C_FLAGS=-O3
+      - -DCMAKE_CXX_FLAGS=-O3
       - -DWHISPER_TARGET_NAME=whisper-fallback1
-      - -DBLAS_LIB_PATH=/app/lib/libopenblas.so
-      - -DCMAKE_C_FLAGS='-O3 -I$$C_INCLUDE_PATH/openblas'
-      - -DCMAKE_CXX_FLAGS='-O3 -I$$CPLUS_INCLUDE_PATH/openblas'
     sources:
       - type: archive
-        url: https://github.com/ggerganov/whisper.cpp/archive/refs/tags/v1.6.2.tar.gz
-        sha256: da7988072022acc3cfa61b370b3c51baad017f1900c3dc4e68cb276499f66894
+        url: https://github.com/ggerganov/whisper.cpp/archive/refs/tags/v1.7.1.tar.gz
+        sha256: 97f19a32212f2f215e538ee37a16ff547aaebc54817bd8072034e02466ce6d55
       - type: patch
         path: patches/whispercpp.patch
 
   - name: whispercpp-fallback
+    only-arches:
+      - x86_64
     buildsystem: cmake-ninja
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
-      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+      - -DGGML_NATIVE=OFF
+      - -DGGML_BLAS=ON
+      - -DGGML_BLAS_VENDOR=OpenBLAS
+      - -DGGML_AVX=OFF
+      - -DGGML_AVX2=OFF
+      - -DGGML_FMA=OFF
+      - -DGGML_F16C=OFF
       - -DBUILD_SHARED_LIBS=ON
       - -DWHISPER_BUILD_TESTS=OFF
       - -DWHISPER_BUILD_EXAMPLES=OFF
-      - -DWHISPER_OPENBLAS=ON
-      - -DWHISPER_NO_AVX=ON
-      - -DWHISPER_NO_AVX2=ON
-      - -DWHISPER_NO_FMA=ON
-      - -DWHISPER_NO_F16C=ON
+      - -DCMAKE_C_FLAGS=-O3
+      - -DCMAKE_CXX_FLAGS=-O3
       - -DWHISPER_TARGET_NAME=whisper-fallback
-      - -DBLAS_LIB_PATH=/app/lib/libopenblas.so
-      - -DCMAKE_C_FLAGS='-O3 -I$$C_INCLUDE_PATH/openblas'
-      - -DCMAKE_CXX_FLAGS='-O3 -I$$CPLUS_INCLUDE_PATH/openblas'
     sources:
       - type: archive
-        url: https://github.com/ggerganov/whisper.cpp/archive/refs/tags/v1.6.2.tar.gz
-        sha256: da7988072022acc3cfa61b370b3c51baad017f1900c3dc4e68cb276499f66894
+        url: https://github.com/ggerganov/whisper.cpp/archive/refs/tags/v1.7.1.tar.gz
+        sha256: 97f19a32212f2f215e538ee37a16ff547aaebc54817bd8072034e02466ce6d55
       - type: patch
         path: patches/whispercpp.patch
 
@@ -592,9 +604,9 @@ modules:
       - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
       - -DTUNERS=OFF
     sources:
-      - type: git
-        url: https://github.com/CNugteren/CLBlast.git
-        commit: e3ce21bb937f07b8282dccf4823e2acbdf286d17
+      - type: archive
+        url: https://github.com/CNugteren/CLBlast/archive/refs/tags/1.6.3.tar.gz
+        sha256: c05668c7461e8440fce48c9f7a8966a6f9e0923421acd7c0357ece9b1d83f20e
 
   - name: whispercpp-clblast
     only-arches:
@@ -609,15 +621,16 @@ modules:
       - -DWHISPER_CLBLAST=ON
       - -DWHISPER_NO_AVX2=ON
       - -DWHISPER_NO_FMA=ON
+      - -DCMAKE_C_FLAGS=-O3
+      - -DCMAKE_CXX_FLAGS=-O3
       - -DWHISPER_TARGET_NAME=whisper-clblast
-      - -DCMAKE_C_FLAGS='-O3'
-      - -DCMAKE_CXX_FLAGS='-O3'
     sources:
+        # Using older whisper.cpp version because the latest one doesn't support OpenCL
       - type: archive
         url: https://github.com/ggerganov/whisper.cpp/archive/refs/tags/v1.6.2.tar.gz
         sha256: da7988072022acc3cfa61b370b3c51baad017f1900c3dc4e68cb276499f66894
       - type: patch
-        path: patches/whispercpp.patch
+        path: patches/whispercpp-clblast.patch
 
   - name: libnumbertext
     buildsystem: autotools
@@ -711,8 +724,6 @@ modules:
         url: https://www.cpan.org/src/5.0/perl-5.38.0.tar.gz
         sha256: 213ef58089d2f2c972ea353517dc60ec3656f050dcc027666e118b508423e517
 
-  - python3-modules-x86-64.yaml
-
   - name: oneapi
     only-arches:
       - x86_64
@@ -748,6 +759,8 @@ modules:
       - type: archive
         url: https://github.com/oneapi-src/oneDNN/archive/refs/tags/v3.3.1.tar.gz
         sha256: e0b7a9452162e854cf08b4e90bcd1b382b9903ace6a61503a872573880d24c3f
+
+  - python3-modules-x86-64.yaml
 
   - name: python3-pybind11
     buildsystem: simple
@@ -871,21 +884,48 @@ modules:
     buildsystem: cmake-ninja
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
-      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+      - -DGGML_NATIVE=OFF
+      - -DGGML_BLAS=ON
+      - -DGGML_BLAS_VENDOR=OpenBLAS
+      - -DWHISPER_OPENVINO=ON
+      - -DOpenVINO_DIR=/app/opt/intel/openvino/runtime/cmake
+      - -DGGML_AVX=ON
+      - -DGGML_AVX2=OFF
+      - -DGGML_FMA=OFF
+      - -DGGML_F16C=ON
       - -DBUILD_SHARED_LIBS=ON
       - -DWHISPER_BUILD_TESTS=OFF
       - -DWHISPER_BUILD_EXAMPLES=OFF
-      - -DWHISPER_OPENVINO=ON
-      - -DWHISPER_NO_AVX2=ON
-      - -DWHISPER_NO_FMA=ON
+      - -DCMAKE_C_FLAGS=-O3
+      - -DCMAKE_CXX_FLAGS=-O3
       - -DWHISPER_TARGET_NAME=whisper-openvino
-      - -DCMAKE_C_FLAGS='-O3'
-      - -DCMAKE_CXX_FLAGS='-O3'
-      - -DOpenVINO_DIR=/app/opt/intel/openvino/runtime/cmake
     sources:
       - type: archive
-        url: https://github.com/ggerganov/whisper.cpp/archive/refs/tags/v1.6.2.tar.gz
-        sha256: da7988072022acc3cfa61b370b3c51baad017f1900c3dc4e68cb276499f66894
+        url: https://github.com/ggerganov/whisper.cpp/archive/refs/tags/v1.7.1.tar.gz
+        sha256: 97f19a32212f2f215e538ee37a16ff547aaebc54817bd8072034e02466ce6d55
+      - type: patch
+        path: patches/whispercpp.patch
+
+  - name: whispercpp-vulkan
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DGGML_NATIVE=OFF
+      - -DGGML_VULKAN=ON
+      - -DGGML_AVX=ON
+      - -DGGML_AVX2=OFF
+      - -DGGML_FMA=OFF
+      - -DGGML_F16C=ON
+      - -DBUILD_SHARED_LIBS=ON
+      - -DWHISPER_BUILD_TESTS=OFF
+      - -DWHISPER_BUILD_EXAMPLES=OFF
+      - -DCMAKE_C_FLAGS=-O3
+      - -DCMAKE_CXX_FLAGS=-O3
+      - -DWHISPER_TARGET_NAME=whisper-vulkan
+    sources:
+      - type: archive
+        url: https://github.com/ggerganov/whisper.cpp/archive/refs/tags/v1.7.1.tar.gz
+        sha256: 97f19a32212f2f215e538ee37a16ff547aaebc54817bd8072034e02466ce6d55
       - type: patch
         path: patches/whispercpp.patch
 
@@ -912,6 +952,16 @@ modules:
       - type: file
         url: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/b31f6b79-10aa-4119-a437-48fe2775633b/l_tbb_oneapi_p_2021.12.0.499_offline.sh
         sha256: 13e981cb4d9d3f72058cc136f8cdedf6ba9af225ae317f91b59e2050b0d49e43
+
+  - name: xdo
+    buildsystem: simple
+    build-commands:
+      - make
+      - make PREFIX=${FLATPAK_DEST} install
+    sources:
+      - type: archive
+        url: https://github.com/jordansissel/xdotool/archive/33092d8a74d60c9ad3ab39c4f05b90e047ea51d8.zip
+        sha256: cba1c7d0c23cc60cd0b1f5483f84296ff91360598e2c19c57395aec530af99ad
 
   - name: dsnote
     buildsystem: cmake-ninja
@@ -944,6 +994,7 @@ modules:
       - -DBUILD_APRILASR=OFF
       - -DBUILD_HTML2MD=OFF
       - -DBUILD_MADDY=OFF
+      - -DBUILD_XDO=OFF
     build-options:
       arch:
         aarch64:
@@ -954,4 +1005,5 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: f062ac5e62c2830a68a698fd9b5ee2ea9c7dbbb0
+        commit: df542e541cb7040f45bc5af9134678ac3ce96978
+
