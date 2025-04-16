@@ -59,13 +59,14 @@ cleanup:
   - /bin/spellout
   - /bin/vulkan*
   - /bin/speak*
+  - /bin/xdo*
   - "*.a"
   - "*.la"
 add-extensions:
   net.mkiol.SpeechNote.Addon:
     directory: extensions
     no-autodownload: true
-    autodelete: true
+    autodelete: false
     subdirectories: true
     version: stable
     versions: stable;beta;test;master
@@ -101,8 +102,8 @@ modules:
             - -DTARGET=ARMV8
     sources:
       - type: archive
-        url: https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.26/OpenBLAS-0.3.26.tar.gz
-        sha256: 4e6e4f5cb14c209262e33e6816d70221a2fe49eb69eaf0a06f065598ac602c68
+        url: https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.29/OpenBLAS-0.3.29.tar.gz
+        sha256: 38240eee1b29e2bde47ebb5d61160207dc68668a54cac62c076bb5032013b1eb
 
   - name: mbrola
     buildsystem: simple
@@ -129,6 +130,8 @@ modules:
       - type: archive
         url: https://github.com/rhasspy/espeak-ng/archive/8593723f10cfd9befd50de447f14bf0a9d2a14a4.zip
         sha256: cc8092f23a28ccd79b1c5e62984a4c4ac1959d2d0b8193ac208d728c620bd5ed
+      - type: patch
+        path: patches/espeak-flatpak.patch
 
   - name: boost
     buildsystem: simple
@@ -139,7 +142,7 @@ modules:
       - "./b2 -j ${FLATPAK_BUILDER_N_JOBS} install"
     sources:
       - type: archive
-        url: https://boostorg.jfrog.io/artifactory/main/release/1.82.0/source/boost_1_82_0.tar.bz2
+        url: https://archives.boost.io/release/1.82.0/source/boost_1_82_0.tar.bz2
         sha256: a6e1ab9b0860e6a2881dd7b21fe9f737a095e5f33a3a874afc6a345228597ee6
 
   - name: webrtcvad
@@ -279,8 +282,8 @@ modules:
       - /share
     sources:
       - type: archive
-        url: https://github.com/pybind/pybind11/archive/refs/tags/v2.11.1.tar.gz
-        sha256: d475978da0cdc2d43b73f30910786759d593a9d8ee05b1b6846d1eb16c6d2e0c
+        url: https://github.com/pybind/pybind11/archive/refs/tags/v2.13.6.tar.gz
+        sha256: e08cb87f4773da97fa7b5f035de8763abc656d87d5773e62f6da0587d1f0ec20
 
   - name: rnnoise
     buildsystem: autotools
@@ -329,7 +332,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/RHVoice/RHVoice.git
-        commit: 71a1a830d2d860688ffcbb0d27d4de260136d161
+        commit: 3e61d440308cedc53f56d0d9f22c380af80d933e
       - type: patch
         path: patches/rhvoice.patch
 
@@ -762,7 +765,19 @@ modules:
 
   - python3-modules-x86-64.yaml
 
+  - name: phonemizer-patch
+    only-arches:
+      - x86_64
+    buildsystem: simple
+    build-commands:
+      - patch --batch --unified -p1 --directory=${FLATPAK_DEST}/lib/python3.11/site-packages/phonemizer -i "$(realpath .)"/phonemizer.patch
+    sources:
+      - type: file
+        path: patches/phonemizer.patch
+
   - name: python3-pybind11
+    only-arches:
+      - x86_64
     buildsystem: simple
     cleanup:
       - /bin
@@ -1008,15 +1023,10 @@ modules:
       - -DBUILD_MADDY=OFF
       - -DBUILD_XDO=OFF
       - -DBUILD_SAM=OFF
-    build-options:
-      arch:
-        aarch64:
-          config-opts:
-            - -DWITH_PY=OFF
     post-install:
       - install -d ${FLATPAK_DEST}/extensions
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: a00ec7fca13d4a7ac21beadbe5afd38c629c3242
+        commit: ca2087d3cc7841b08597016b9a97433070c62124
 
