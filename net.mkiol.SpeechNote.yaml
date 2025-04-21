@@ -1,6 +1,6 @@
 app-id: net.mkiol.SpeechNote
 runtime: org.kde.Platform
-runtime-version: "5.15-23.08"
+runtime-version: "5.15-24.08"
 sdk: org.kde.Sdk
 rename-icon: dsnote
 command: dsnote
@@ -1029,4 +1029,3 @@ modules:
       - type: git
         url: https://github.com/mkiol/dsnote.git
         commit: ca2087d3cc7841b08597016b9a97433070c62124
-
