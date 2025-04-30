@@ -9,7 +9,7 @@ modules:
     cleanup:
       - /bin/isympy
     build-options:
-      strip: true
+      strip: false
     build-commands:
       - pip3 install --verbose --exists-action=i --no-index --find-links="file://${PWD}"
         --prefix=${FLATPAK_DEST} Jinja2 filelock fsspec mpmath networkx sympy typing_extensions --no-build-isolation
