@@ -737,6 +737,7 @@ modules:
       - /opt/oneapi
     build-commands:
       - sh l_BaseKit_p_2024.0.0.49564_offline.sh --extract-folder ./oneapi -a --eula accept --silent --install-dir ${FLATPAK_DEST}/opt/oneapi
+      - chmod -R +w ${FLATPAK_DEST}/opt/oneapi
     sources:
       - type: file
         url: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/20f4e6a1-6b0b-4752-b8c1-e5eacba10e01/l_BaseKit_p_2024.0.0.49564_offline.sh
@@ -1011,4 +1012,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: 8c105b95552e91a6a8efabca251f3ac447b6934a
+        commit: 593008d479e264a16f36bf736b13cb977297dac6
