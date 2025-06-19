@@ -1,6 +1,6 @@
 app-id: net.mkiol.SpeechNote
 runtime: org.kde.Platform
-runtime-version: "5.15-23.08"
+runtime-version: "5.15-24.08"
 sdk: org.kde.Sdk
 rename-icon: dsnote
 command: dsnote
@@ -19,7 +19,7 @@ finish-args:
   - --filesystem=xdg-documents
   - --filesystem=xdg-videos
   - --env=PYTORCH_TENSOREXPR=0
-  - --env=PYTHONPATH=/app/extensions/nvidia/lib/python3.11/site-packages:/app/extensions/amd/lib/python3.11/site-packages:/app/extensions/cpu/lib/python3.11/site-packages:/app/lib/python3.11/site-packages
+  - --env=PYTHONPATH=/app/extensions/nvidia/lib/python3.12/site-packages:/app/extensions/amd/lib/python3.12/site-packages:/app/extensions/cpu/lib/python3.12/site-packages:/app/lib/python3.12/site-packages
   - --env=LD_LIBRARY_PATH=/app/opt/intel/lib:/app/extensions/nvidia/lib:/app/extensions/amd/lib:/app/extensions/cpu/lib:/app/extensions/nvidia/cuda/lib64:/app/extensions/amd/rocm/lib:/app/extensions/amd/rocm/lib/llvm/lib:/app/extensions/amd/zluda
   - --env=OPENCL_VENDOR_PATH=/app/opt/opencl/vendors
   - --env=PERL5LIB=/app/lib/perl5/site_perl
@@ -34,16 +34,16 @@ cleanup:
   - /include
   - /lib/cmake
   - /lib/pkgconfig
-  - /lib/python3.11/site-packages/__pycache__
-  - /lib/python3.11/site-packages/nvidia*
-  - /lib/python3.11/site-packages/cmake*
-  - /lib/python3.11/site-packages/git*
-  - /lib/python3.11/site-packages/Git*
-  - /lib/python3.11/site-packages/torch/test
-  - /lib/python3.11/site-packages/torch/include
-  - /lib/python3.11/site-packages/pypinyin/__pycache__
-  - /lib/python3.11/site-packages/pandas/tests
-  - /lib/python3.11/site-packages/torchvision*
+  - /lib/python3.12/site-packages/__pycache__
+  - /lib/python3.12/site-packages/nvidia*
+  - /lib/python3.12/site-packages/cmake*
+  - /lib/python3.12/site-packages/git*
+  - /lib/python3.12/site-packages/Git*
+  - /lib/python3.12/site-packages/torch/test
+  - /lib/python3.12/site-packages/torch/include
+  - /lib/python3.12/site-packages/pypinyin/__pycache__
+  - /lib/python3.12/site-packages/pandas/tests
+  - /lib/python3.12/site-packages/torchvision*
   - /lib/libSPIRV*
   - /lib/libshaderc*
   - /lib/debug/opt
@@ -59,13 +59,14 @@ cleanup:
   - /bin/spellout
   - /bin/vulkan*
   - /bin/speak*
+  - /bin/xdo*
   - "*.a"
   - "*.la"
 add-extensions:
   net.mkiol.SpeechNote.Addon:
     directory: extensions
     no-autodownload: true
-    autodelete: true
+    autodelete: false
     subdirectories: true
     version: stable
     versions: stable;beta;test;master
@@ -79,8 +80,8 @@ modules:
       - -DFMT_FUZZ=OFF
     sources:
       - type: archive
-        url: https://github.com/fmtlib/fmt/releases/download/10.2.1/fmt-10.2.1.zip
-        sha256: 312151a2d13c8327f5c9c586ac6cf7cddc1658e8f53edae0ec56509c8fa516c9
+        url: https://github.com/fmtlib/fmt/releases/download/11.1.3/fmt-11.1.3.zip
+        sha256: 7df2fd3426b18d552840c071c977dc891efe274051d2e7c47e2c83c3918ba6df
 
   - name: openblas
     buildsystem: cmake-ninja
@@ -101,8 +102,8 @@ modules:
             - -DTARGET=ARMV8
     sources:
       - type: archive
-        url: https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.26/OpenBLAS-0.3.26.tar.gz
-        sha256: 4e6e4f5cb14c209262e33e6816d70221a2fe49eb69eaf0a06f065598ac602c68
+        url: https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.29/OpenBLAS-0.3.29.tar.gz
+        sha256: 38240eee1b29e2bde47ebb5d61160207dc68668a54cac62c076bb5032013b1eb
 
   - name: mbrola
     buildsystem: simple
@@ -129,6 +130,8 @@ modules:
       - type: archive
         url: https://github.com/rhasspy/espeak-ng/archive/8593723f10cfd9befd50de447f14bf0a9d2a14a4.zip
         sha256: cc8092f23a28ccd79b1c5e62984a4c4ac1959d2d0b8193ac208d728c620bd5ed
+      - type: patch
+        path: patches/espeak-flatpak.patch
 
   - name: boost
     buildsystem: simple
@@ -139,7 +142,7 @@ modules:
       - "./b2 -j ${FLATPAK_BUILDER_N_JOBS} install"
     sources:
       - type: archive
-        url: https://boostorg.jfrog.io/artifactory/main/release/1.82.0/source/boost_1_82_0.tar.bz2
+        url: https://archives.boost.io/release/1.82.0/source/boost_1_82_0.tar.bz2
         sha256: a6e1ab9b0860e6a2881dd7b21fe9f737a095e5f33a3a874afc6a345228597ee6
 
   - name: webrtcvad
@@ -279,8 +282,8 @@ modules:
       - /share
     sources:
       - type: archive
-        url: https://github.com/pybind/pybind11/archive/refs/tags/v2.11.1.tar.gz
-        sha256: d475978da0cdc2d43b73f30910786759d593a9d8ee05b1b6846d1eb16c6d2e0c
+        url: https://github.com/pybind/pybind11/archive/refs/tags/v2.13.6.tar.gz
+        sha256: e08cb87f4773da97fa7b5f035de8763abc656d87d5773e62f6da0587d1f0ec20
 
   - name: rnnoise
     buildsystem: autotools
@@ -329,7 +332,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/RHVoice/RHVoice.git
-        commit: 71a1a830d2d860688ffcbb0d27d4de260136d161
+        commit: 846293f4f966381802131ea3c94ff12461b6058a
       - type: patch
         path: patches/rhvoice.patch
 
@@ -692,38 +695,6 @@ modules:
         url: https://github.com/abb128/april-asr/archive/3308e68442664552de593957cad0fa443ea183dd.zip
         sha256: 0640fc16a43018afb1db9f17e93f545d7ac1f07e4bc47ba318d2c7311bef2df5
 
-  - name: uroman
-    only-arches:
-      - x86_64
-    buildsystem: simple
-    build-commands:
-      - "mkdir -p ${FLATPAK_DEST}/share/uroman"
-      - "cp -r ./bin ${FLATPAK_DEST}/share/uroman"
-      - "cp -r ./data ${FLATPAK_DEST}/share/uroman"
-      - "cp -r ./lib ${FLATPAK_DEST}/share/uroman"
-    sources:
-      - type: archive
-        url: https://github.com/isi-nlp/uroman/archive/refs/tags/v1.2.8.tar.gz
-        sha256: 08e5058341428f3f4ca2401d409df1f4341c386853c4de836e7ab2c2a750cb88
-
-  - name: perl
-    only-arches:
-      - x86_64
-    buildsystem: simple
-    build-options:
-      no-debuginfo: true
-    build-commands:
-      - ./configure.gnu -des
-      - make -j${FLATPAK_BUILDER_N_JOBS}
-      - mkdir -p ${FLATPAK_DEST}/bin
-      - cp perl ${FLATPAK_DEST}/bin/
-      - mkdir -p ${FLATPAK_DEST}/lib/perl5/site_perl
-      - cp -r lib/* ${FLATPAK_DEST}/lib/perl5/site_perl/
-    sources:
-      - type: archive
-        url: https://www.cpan.org/src/5.0/perl-5.38.0.tar.gz
-        sha256: 213ef58089d2f2c972ea353517dc60ec3656f050dcc027666e118b508423e517
-
   - name: oneapi
     only-arches:
       - x86_64
@@ -734,6 +705,7 @@ modules:
       - /opt/oneapi
     build-commands:
       - sh l_BaseKit_p_2024.0.0.49564_offline.sh --extract-folder ./oneapi -a --eula accept --silent --install-dir ${FLATPAK_DEST}/opt/oneapi
+      - chmod -R +w ${FLATPAK_DEST}/opt/oneapi
     sources:
       - type: file
         url: https://registrationcenter-download.intel.com/akdlm/IRC_NAS/20f4e6a1-6b0b-4752-b8c1-e5eacba10e01/l_BaseKit_p_2024.0.0.49564_offline.sh
@@ -762,11 +734,23 @@ modules:
 
   - python3-modules-x86-64.yaml
 
+  - name: phonemizer-patch
+    only-arches:
+      - x86_64
+    buildsystem: simple
+    build-commands:
+      - patch --batch --unified -p1 --directory=${FLATPAK_DEST}/lib/python3.12/site-packages/phonemizer -i "$(realpath .)"/phonemizer.patch
+    sources:
+      - type: file
+        path: patches/phonemizer.patch
+
   - name: python3-pybind11
+    only-arches:
+      - x86_64
     buildsystem: simple
     cleanup:
       - /bin
-      - /lib/python3.11/site-packages/pybind11*
+      - /lib/python3.12/site-packages/pybind11*
     build-commands:
       - pip3 install --verbose --exists-action=i --no-index --find-links="file://${PWD}"
         --prefix=${FLATPAK_DEST} "pybind11" --no-build-isolation
@@ -800,7 +784,7 @@ modules:
       - -DCMAKE_INSTALL_PREFIX=/app/extensions/cpu
       - -DCMAKE_SYSTEM_PREFIX_PATH=/app
     post-install:
-      - rm -rf ${FLATPAK_DEST}/lib/python3.11/site-packages/ctranslate2*
+      - rm -rf ${FLATPAK_DEST}/lib/python3.12/site-packages/ctranslate2*
       - mkdir -p ${FLATPAK_DEST}/extensions/cpu
       - cd python && python setup.py bdist_wheel
       - pip3 install --verbose --exists-action=i --no-index --prefix=${FLATPAK_DEST}/extensions/cpu --no-build-isolation python/dist/*.whl
@@ -820,8 +804,8 @@ modules:
       - -DBUILD_EXE=OFF
     sources:
       - type: archive
-        url: https://github.com/tim-gromeyer/html2md/archive/refs/tags/v1.5.3.tar.gz
-        sha256: 9853eeb1d2b1ca34ee7143521d03daacbcfac57a1763180ebd0730595cb46961
+        url: https://github.com/tim-gromeyer/html2md/archive/refs/tags/v1.6.4.tar.gz
+        sha256: e34c80981d6ee5f4a699985dc4a68b0b280542a5c5e5780fdebc3ba0ca30553d
       - type: patch
         path: patches/html2md.patch
 
@@ -833,23 +817,6 @@ modules:
       - type: archive
         url: https://github.com/progsource/maddy/archive/refs/tags/1.3.0.tar.gz
         sha256: 561681f8c8d2b998c153cda734107a0bc1dea4bb0df69fd813922da63fa9f3e7
-
-  - name: xkbcommon
-    buildsystem: meson
-    config-opts:
-      - --buildtype=release
-      - -Ddefault_library=static
-      - -Denable-docs=false
-      - -Denable-tools=false
-      - -Denable-bash-completion=false
-      - -Dx-locale-root=/usr/share/X11/locale
-    cleanup:
-      - /bin
-      - /libexec
-    sources:
-      - type: archive
-        url: https://xkbcommon.org/download/libxkbcommon-1.6.0.tar.xz
-        sha256: 0edc14eccdd391514458bc5f5a4b99863ed2d651e4dd761a90abf4f46ef99c2b
 
   - name: openvino
     only-arches:
@@ -962,6 +929,20 @@ modules:
       - type: archive
         url: https://github.com/jordansissel/xdotool/archive/33092d8a74d60c9ad3ab39c4f05b90e047ea51d8.zip
         sha256: cba1c7d0c23cc60cd0b1f5483f84296ff91360598e2c19c57395aec530af99ad
+      - type: patch
+        path: patches/xdo.patch
+
+  - name: sam
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+    sources:
+      - type: archive
+        url: https://github.com/s-macke/SAM/archive/a7b36efac730957b59471a42a45fd779f94d77dd.zip
+        sha256: 342e245c84b14945b33dd8b272373eee517d239c612763ec01d3fa3bbee6bcb1
+      - type: patch
+        path: patches/sam.patch
 
   - name: dsnote
     buildsystem: cmake-ninja
@@ -995,14 +976,10 @@ modules:
       - -DBUILD_HTML2MD=OFF
       - -DBUILD_MADDY=OFF
       - -DBUILD_XDO=OFF
-    build-options:
-      arch:
-        aarch64:
-          config-opts:
-            - -DWITH_PY=OFF
+      - -DBUILD_SAM=OFF
     post-install:
       - install -d ${FLATPAK_DEST}/extensions
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: bc603e1d3cc013921dbdff66da3742612f6663fd
+        commit: 329200a6bd063b35388c312dd7cbb929b8061bfb
