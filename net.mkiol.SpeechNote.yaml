@@ -929,6 +929,8 @@ modules:
       - type: archive
         url: https://github.com/jordansissel/xdotool/archive/33092d8a74d60c9ad3ab39c4f05b90e047ea51d8.zip
         sha256: cba1c7d0c23cc60cd0b1f5483f84296ff91360598e2c19c57395aec530af99ad
+      - type: patch
+        path: patches/xdo.patch
 
   - name: sam
     buildsystem: cmake-ninja
@@ -980,4 +982,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: 4215cadfc2f36e960c84b8c2a2fc67a1d5a9aea7
+        commit: 329200a6bd063b35388c312dd7cbb929b8061bfb
