@@ -99,7 +99,7 @@ modules:
       arch:
         x86_64:
           config-opts:
-            - -DTARGET=SKYLAKEX
+            - -DTARGET=HASWELL
         aarch64:
           config-opts:
             - -DTARGET=ARMV8
