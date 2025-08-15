@@ -97,6 +97,9 @@ modules:
     build-options:
       no-debuginfo: true
       arch:
+        x86_64:
+          config-opts:
+            - -DTARGET=CORE2
         aarch64:
           config-opts:
             - -DTARGET=ARMV8
@@ -982,4 +985,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: 3e0f6ba094fcae9af27690bcdacade598a87e608
+        commit: 20b421936076fbdcae6dabefff460b79c1baf539
