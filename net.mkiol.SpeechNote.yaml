@@ -46,7 +46,6 @@ cleanup:
   - /lib/python3.12/site-packages/torchvision*
   - /lib/libSPIRV*
   - /lib/libshaderc*
-  - /lib/debug/opt
   - /share/cmake
   - /share/doc
   - /share/locale
