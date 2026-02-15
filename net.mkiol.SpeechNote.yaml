@@ -969,7 +969,6 @@ modules:
       - -DBUILD_SSPLITCPP=OFF
       - -DBUILD_RHVOICE=OFF
       - -DBUILD_BERGAMOT=OFF
-      - -DBUILD_UROMAN=OFF
       - -DBUILD_RUBBERBAND=OFF
       - -DBUILD_FFMPEG=OFF
       - -DBUILD_TAGLIB=OFF
@@ -985,4 +984,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: 20b421936076fbdcae6dabefff460b79c1baf539
+        commit: 4c4e8a66c71d9846d41bbda92e2d221c2b581412
