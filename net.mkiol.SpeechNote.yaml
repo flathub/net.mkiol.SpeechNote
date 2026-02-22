@@ -383,7 +383,7 @@ modules:
       - -DUSE_INTRINSICS_ARMV7_NEONVFPV4=ON
     build-options:
       arch:
-        x86-64:
+        x86_64:
           config-opts:
             - -DBUILD_ARCH=x86-64
         aarch64:
@@ -984,4 +984,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/mkiol/dsnote.git
-        commit: 4c4e8a66c71d9846d41bbda92e2d221c2b581412
+        commit: 7fae3bda463a09a22e9b69bab2e72f0a0091c969
